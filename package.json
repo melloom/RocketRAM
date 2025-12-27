@@ -1,0 +1,39 @@
+{
+  "name": "rocketram",
+  "version": "1.0.0",
+  "description": "RocketRAM - A powerful PC performance monitoring and optimization widget",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev"
+  },
+  "keywords": ["performance", "monitor", "widget", "system"],
+  "author": "",
+  "license": "MIT",
+  "build": {
+    "appId": "com.rocketram.app",
+    "productName": "RocketRAM",
+    "win": {
+      "icon": "icon.ico",
+      "target": "nsis"
+    },
+    "mac": {
+      "icon": "icon.icns",
+      "category": "public.app-category.utilities"
+    },
+    "linux": {
+      "icon": "icon.png"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/**/*"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^28.0.0"
+  },
+  "dependencies": {
+    "systeminformation": "^5.21.0"
+  }
+}
+
