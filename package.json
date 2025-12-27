@@ -10,7 +10,7 @@
     "build:win": "electron-builder --win",
     "build:portable": "electron-builder --win portable",
     "build:dir": "electron-builder --win --dir",
-    "build:packager": "electron-packager . RocketRAM --platform=win32 --arch=x64 --out=dist --overwrite",
+    "build:packager": "electron-packager . RocketRAM --platform=win32 --arch=x64 --out=dist --overwrite --asar=false",
     "dist": "npm run build:packager"
   },
   "keywords": ["performance", "monitor", "widget", "system"],

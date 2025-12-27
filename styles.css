@@ -108,6 +108,9 @@ body {
   display: flex;
   gap: 8px;
   -webkit-app-region: no-drag;
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
 }
 
 .ctrl-btn {
@@ -122,6 +125,11 @@ body {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  -webkit-app-region: no-drag;
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+  user-select: none;
 }
 
 .ctrl-btn:hover {
@@ -833,7 +841,27 @@ body {
 .settings-content {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 20px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.settings-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.settings-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.settings-content::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.3);
+  border-radius: 4px;
+}
+
+.settings-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.5);
 }
 
 .settings-tabs {
@@ -948,6 +976,11 @@ body {
   gap: 10px;
   transition: all 0.2s ease;
   margin-top: 16px;
+  pointer-events: auto;
+  -webkit-app-region: no-drag;
+  user-select: none;
+  position: relative;
+  z-index: 10;
 }
 
 .action-btn:hover {

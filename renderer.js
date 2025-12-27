@@ -265,6 +265,199 @@ async function updateUptime() {
   }
 }
 
+async function updateGPU() {
+  try {
+    if (!gpuCard) return;
+    const graphics = await Promise.race([
+      si.graphics(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000))
+    ]);
+    
+    if (graphics && graphics.controllers && graphics.controllers.length > 0) {
+      const gpu = graphics.controllers[0];
+      gpuCard.style.display = 'block';
+      gpuName.textContent = (gpu.model || 'Unknown GPU').substring(0, 30);
+      gpuValue.textContent = '--%';
+      gpuDetail.textContent = gpu.vram ? formatBytes(gpu.vram * 1024 * 1024) : '--';
+    } else {
+      gpuCard.style.display = 'none';
+    }
+  } catch (error) {
+    if (gpuCard) gpuCard.style.display = 'none';
+  }
+}
+
+async function updateBattery() {
+  try {
+    if (!batteryCard) return;
+    const battery = await Promise.race([
+      si.battery(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000))
+    ]);
+    
+    if (battery && battery.hasBattery) {
+      batteryCard.style.display = 'block';
+      const percent = Math.round(battery.percent || 0);
+      batteryValue.textContent = percent + '%';
+      batteryBar.style.width = percent + '%';
+      batteryStatus.textContent = battery.isCharging ? 'Charging' : 'Discharging';
+      batteryTime.textContent = battery.timeRemaining ? formatUptime(battery.timeRemaining * 60) : '--';
+      batteryDetail.textContent = battery.isCharging ? 'Plugged in' : 'On battery';
+    } else {
+      batteryCard.style.display = 'none';
+    }
+  } catch (error) {
+    if (batteryCard) batteryCard.style.display = 'none';
+  }
+}
+
+function drawGraph(canvasId, data, color) {
+  try {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || !data || data.length === 0) return;
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    ctx.clearRect(0, 0, width, height);
+    
+    if (data.length < 2) return;
+    
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    
+    const maxValue = Math.max(...data, 100);
+    const stepX = width / (data.length - 1);
+    
+    data.forEach((value, index) => {
+      const x = index * stepX;
+      const y = height - (value / maxValue) * height;
+      
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+    
+    ctx.stroke();
+  } catch (error) {
+    console.error('Graph draw error:', error);
+  }
+}
+
+function checkAlerts() {
+  try {
+    // Simple alert checking - can be enhanced
+    const cpuCard = cpuValue.closest('.metric-card');
+    const ramCard = ramValue.closest('.metric-card');
+    
+    const cpuPercent = parseInt(cpuValue.textContent) || 0;
+    const ramPercent = parseInt(ramValue.textContent) || 0;
+    
+    // Update alert states
+    if (cpuPercent > 90) {
+      if (!alertStates.cpu.active) {
+        alertStates.cpu.active = true;
+        alertStates.cpu.startTime = Date.now();
+      }
+    } else {
+      alertStates.cpu.active = false;
+      alertStates.cpu.notified = false;
+    }
+    
+    if (ramPercent > 85) {
+      if (!alertStates.ram.active) {
+        alertStates.ram.active = true;
+        alertStates.ram.startTime = Date.now();
+      }
+    } else {
+      alertStates.ram.active = false;
+      alertStates.ram.notified = false;
+    }
+  } catch (error) {
+    console.error('Alert check error:', error);
+  }
+}
+
+function loadServices() {
+  try {
+    const servicesList = document.getElementById('servicesList');
+    if (!servicesList) return;
+    
+    servicesList.innerHTML = '<div class="loading-state"><div class="spinner"></div><span>Loading services...</span></div>';
+    
+    const { exec } = require('child_process');
+    exec('powershell -Command "Get-Service | Select-Object Name, Status, DisplayName | ConvertTo-Json"', (error, stdout) => {
+      if (error || !stdout) {
+        servicesList.innerHTML = '<div class="empty-state">Failed to load services. Admin rights may be required.</div>';
+        return;
+      }
+      
+      try {
+        const services = JSON.parse(stdout);
+        const serviceArray = Array.isArray(services) ? services : [services].filter(s => s);
+        
+        servicesList.innerHTML = '';
+        serviceArray.forEach(service => {
+          if (!service || !service.Name) return;
+          
+          const item = document.createElement('div');
+          item.className = 'service-item';
+          item.innerHTML = `
+            <div class="service-info">
+              <div class="service-name">${service.DisplayName || service.Name}</div>
+              <div class="service-status ${service.Status === 'Running' ? 'running' : 'stopped'}">${service.Status || 'Unknown'}</div>
+            </div>
+          `;
+          servicesList.appendChild(item);
+        });
+      } catch (e) {
+        servicesList.innerHTML = '<div class="empty-state">Error parsing services data.</div>';
+      }
+    });
+  } catch (error) {
+    console.error('Load services error:', error);
+  }
+}
+
+function loadNetworkConnections() {
+  try {
+    const networkList = document.getElementById('networkList');
+    if (!networkList) return;
+    
+    networkList.innerHTML = '<div class="loading-state"><div class="spinner"></div><span>Loading network connections...</span></div>';
+    
+    setTimeout(async () => {
+      try {
+        const interfaces = await si.networkInterfaces();
+        networkList.innerHTML = '';
+        
+        interfaces.forEach(iface => {
+          const item = document.createElement('div');
+          item.className = 'network-item';
+          item.innerHTML = `
+            <div class="network-info">
+              <div class="network-name">${iface.iface || 'Unknown'}</div>
+              <div class="network-details">
+                <span>IP: ${iface.ip4 || 'N/A'}</span>
+                <span>Status: ${iface.operstate || 'Unknown'}</span>
+              </div>
+            </div>
+          `;
+          networkList.appendChild(item);
+        });
+      } catch (error) {
+        networkList.innerHTML = '<div class="empty-state">Failed to load network connections.</div>';
+      }
+    }, 500);
+  } catch (error) {
+    console.error('Load network error:', error);
+  }
+}
+
 // Initial load of static data
 async function loadStaticData() {
   try {
@@ -275,23 +468,49 @@ async function loadStaticData() {
   }
 }
 
-// Control buttons
-collapseBtn.addEventListener('click', () => {
-  isCollapsed = !isCollapsed;
-  content.classList.toggle('collapsed');
-  ipcRenderer.send('toggle-collapse');
-  
-  // Rotate the collapse button icon
-  collapseBtn.style.transform = isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)';
-});
+// Control buttons - with proper event handling
+if (collapseBtn) {
+  collapseBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      isCollapsed = !isCollapsed;
+      if (content) {
+        content.classList.toggle('collapsed');
+      }
+      ipcRenderer.send('toggle-collapse');
+      
+      // Rotate the collapse button icon
+      collapseBtn.style.transform = isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)';
+    } catch (error) {
+      console.error('Collapse button error:', error);
+    }
+  });
+}
 
-minimizeBtn.addEventListener('click', () => {
-  ipcRenderer.send('minimize-app');
-});
+if (minimizeBtn) {
+  minimizeBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      ipcRenderer.send('minimize-app');
+    } catch (error) {
+      console.error('Minimize button error:', error);
+    }
+  });
+}
 
-closeBtn.addEventListener('click', () => {
-  ipcRenderer.send('close-app');
-});
+if (closeBtn) {
+  closeBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      ipcRenderer.send('close-app');
+    } catch (error) {
+      console.error('Close button error:', error);
+    }
+  });
+}
 
 // Main update loop
 async function updateAll() {
@@ -559,36 +778,55 @@ const scheduleTime = document.getElementById('scheduleTime');
 const nextRunTime = document.getElementById('nextRunTime');
 
 // Tab switching
-settingsTabs.forEach(tab => {
-  tab.addEventListener('click', () => {
-    const targetTab = tab.dataset.tab;
-    
-    // Remove active from all tabs and contents
-    settingsTabs.forEach(t => t.classList.remove('active'));
-    tabContents.forEach(c => c.classList.remove('active'));
-    
-    // Add active to clicked tab and corresponding content
-    tab.classList.add('active');
-    document.getElementById(targetTab + 'Tab').classList.add('active');
-    
-    // Load data when tab is opened
-    if (targetTab === 'services') {
-      setTimeout(loadServices, 300);
-    } else if (targetTab === 'network') {
-      setTimeout(loadNetworkConnections, 300);
-    } else if (targetTab === 'startup') {
-      setTimeout(loadStartupPrograms, 300);
-    }
+if (settingsTabs && settingsTabs.length > 0) {
+  settingsTabs.forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      try {
+        const targetTab = tab.dataset.tab;
+        
+        // Remove active from all tabs and contents
+        settingsTabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        // Add active to clicked tab and corresponding content
+        tab.classList.add('active');
+        const targetContent = document.getElementById(targetTab + 'Tab');
+        if (targetContent) {
+          targetContent.classList.add('active');
+        }
+        
+        // Load data when tab is opened
+        if (targetTab === 'services') {
+          setTimeout(loadServices, 300);
+        } else if (targetTab === 'network') {
+          setTimeout(loadNetworkConnections, 300);
+        } else if (targetTab === 'startup') {
+          setTimeout(loadStartupPrograms, 300);
+        }
+      } catch (error) {
+        console.error('Tab switch error:', error);
+      }
+    });
   });
-});
+}
 
 // Open/close settings
-settingsBtn.addEventListener('click', () => {
-  settingsOverlay.classList.add('active');
-  loadSettings();
-  // Update system health when opening settings
-  setTimeout(() => updateSystemHealth(), 500);
-});
+if (settingsBtn) {
+  settingsBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      settingsOverlay.classList.add('active');
+      loadSettings();
+      // Update system health when opening settings
+      setTimeout(() => updateSystemHealth(), 500);
+    } catch (error) {
+      console.error('Settings button error:', error);
+    }
+  });
+}
 
 closeSettingsBtn.addEventListener('click', () => {
   settingsOverlay.classList.remove('active');
@@ -1676,13 +1914,46 @@ if (analyzeDiskBtn) {
   });
 }
 
-// Initialize
-loadStaticData();
-updateAll();
+// Refresh button handlers
+const refreshNetworkBtn = document.getElementById('refreshNetworkBtn');
+const refreshServicesBtn = document.getElementById('refreshServicesBtn');
 
-// Update every second
-setInterval(updateAll, 1000);
+if (refreshNetworkBtn) {
+  refreshNetworkBtn.addEventListener('click', () => {
+    loadNetworkConnections();
+  });
+}
 
-// Less frequent updates for disk (every 5 seconds)
-setInterval(updateDisk, 5000);
+if (refreshServicesBtn) {
+  refreshServicesBtn.addEventListener('click', () => {
+    loadServices();
+  });
+}
+
+// Initialize - wait for DOM to be ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initialize);
+} else {
+  initialize();
+}
+
+function initialize() {
+  try {
+    // Add error handling to all update functions
+    loadStaticData().catch(err => console.error('Load static data error:', err));
+    updateAll().catch(err => console.error('Update all error:', err));
+    
+    // Update every second with error handling
+    setInterval(() => {
+      updateAll().catch(err => console.error('Update error:', err));
+    }, 1000);
+    
+    // Less frequent updates for disk (every 5 seconds)
+    setInterval(() => {
+      updateDisk().catch(err => console.error('Disk update error:', err));
+    }, 5000);
+  } catch (error) {
+    console.error('Initialization error:', error);
+  }
+}
 
