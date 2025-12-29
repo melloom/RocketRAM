@@ -21,7 +21,6 @@
     "productName": "RocketRAM",
     "win": {
       "icon": "icon.ico",
-      "sign": false,
       "verifyUpdateCodeSignature": false,
       "target": [
         {
