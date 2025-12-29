@@ -1,0 +1,77 @@
+{
+  "name": "rocketram",
+  "version": "1.0.0",
+  "description": "RocketRAM - A powerful PC performance monitoring and optimization widget",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:portable": "electron-builder --win portable",
+    "build:dir": "electron-builder --win --dir",
+    "build:packager": "electron-packager . RocketRAM --platform=win32 --arch=x64 --out=dist --overwrite --asar=false",
+    "dist": "npm run build:packager"
+  },
+  "keywords": ["performance", "monitor", "widget", "system"],
+  "author": "Melvin Peralta",
+  "license": "MIT",
+  "build": {
+    "appId": "com.rocketram.app",
+    "productName": "RocketRAM",
+    "copyright": "Copyright © 2025 Melvin Peralta",
+    "compression": "maximum",
+    "win": {
+      "icon": "favicon.ico",
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "publisherName": "Melvin Peralta"
+    },
+    "mac": {
+      "icon": "pc.icns",
+      "category": "public.app-category.utilities",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "entitlements.mac.plist",
+      "entitlementsInherit": "entitlements.mac.plist",
+      "identity": "${env.APPLE_IDENTITY}"
+    },
+    "linux": {
+      "icon": "icon.png",
+      "category": "Utility",
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm"
+      ]
+    },
+    "files": [
+      "**/*",
+      "!node_modules/**/*",
+      "!.git/**/*",
+      "!dist/**/*",
+      "!*.md",
+      "!DISTRIBUTION.md",
+      "!ICON_INSTRUCTIONS.md",
+      "!IMPROVEMENTS.md",
+      "LICENSE.txt",
+      "TERMS_OF_SERVICE.md",
+      "PRIVACY_POLICY.md",
+      "THIRD_PARTY_LICENSES.md",
+      "SECURITY.md",
+      "CHANGELOG.md"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "systeminformation": "^5.21.0"
+  }
+}
+
