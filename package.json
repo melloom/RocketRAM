@@ -14,56 +14,40 @@
     "dist": "npm run build:packager"
   },
   "keywords": ["performance", "monitor", "widget", "system"],
-  "author": "Melvin Peralta",
+  "author": "",
   "license": "MIT",
   "build": {
     "appId": "com.rocketram.app",
     "productName": "RocketRAM",
-    "copyright": "Copyright © 2025 Melvin Peralta",
-    "compression": "maximum",
     "win": {
-      "icon": "favicon.ico",
+      "icon": "icon.ico",
+      "sign": false,
+      "verifyUpdateCodeSignature": false,
       "target": [
         {
           "target": "portable",
           "arch": ["x64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["x64"]
+        },
+        {
+          "target": "dir",
+          "arch": ["x64"]
         }
-      ],
-      "publisherName": "Melvin Peralta"
+      ]
     },
     "mac": {
-      "icon": "pc.icns",
-      "category": "public.app-category.utilities",
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "entitlements": "entitlements.mac.plist",
-      "entitlementsInherit": "entitlements.mac.plist",
-      "identity": "${env.APPLE_IDENTITY}"
+      "icon": "icon.icns",
+      "category": "public.app-category.utilities"
     },
     "linux": {
-      "icon": "icon.png",
-      "category": "Utility",
-      "target": [
-        "AppImage",
-        "deb",
-        "rpm"
-      ]
+      "icon": "icon.png"
     },
     "files": [
       "**/*",
-      "!node_modules/**/*",
-      "!.git/**/*",
-      "!dist/**/*",
-      "!*.md",
-      "!DISTRIBUTION.md",
-      "!ICON_INSTRUCTIONS.md",
-      "!IMPROVEMENTS.md",
-      "LICENSE.txt",
-      "TERMS_OF_SERVICE.md",
-      "PRIVACY_POLICY.md",
-      "THIRD_PARTY_LICENSES.md",
-      "SECURITY.md",
-      "CHANGELOG.md"
+      "!node_modules/**/*"
     ]
   },
   "devDependencies": {
