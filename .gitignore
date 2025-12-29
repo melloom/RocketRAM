@@ -6,6 +6,7 @@ package-lock.json
 dist/
 build/
 <<<<<<< HEAD
+<<<<<<< HEAD
 out/
 *.exe
 *.dmg
@@ -38,6 +39,8 @@ certs/
 .Trashes
 ehthumbs.db
 =======
+=======
+>>>>>>> 9fc11a168edec89db445fca257b499723b76c4e2
 *.exe
 *.dmg
 *.deb
@@ -45,6 +48,9 @@ ehthumbs.db
 
 # OS files
 .DS_Store
+<<<<<<< HEAD
+>>>>>>> 9fc11a168edec89db445fca257b499723b76c4e2
+=======
 >>>>>>> 9fc11a168edec89db445fca257b499723b76c4e2
 Thumbs.db
 desktop.ini
@@ -55,15 +61,19 @@ desktop.ini
 *.swp
 *.swo
 <<<<<<< HEAD
+<<<<<<< HEAD
 *~
 *.sublime-project
 *.sublime-workspace
+=======
+>>>>>>> 9fc11a168edec89db445fca257b499723b76c4e2
 =======
 >>>>>>> 9fc11a168edec89db445fca257b499723b76c4e2
 
 # Logs
 *.log
 npm-debug.log*
+<<<<<<< HEAD
 <<<<<<< HEAD
 yarn-debug.log*
 yarn-error.log*
@@ -76,6 +86,8 @@ lerna-debug.log*
 .env.production
 =======
 >>>>>>> 9fc11a168edec89db445fca257b499723b76c4e2
+=======
+>>>>>>> 9fc11a168edec89db445fca257b499723b76c4e2
 
 # Settings (user-specific)
 rocketram-settings.json
@@ -83,6 +95,7 @@ rocketram-settings.json
 # Temporary files
 *.tmp
 *.temp
+<<<<<<< HEAD
 <<<<<<< HEAD
 .cache/
 .temp/
@@ -116,6 +129,8 @@ coverage/
 
 # Yarn Integrity file
 .yarn-integrity
+=======
+>>>>>>> 9fc11a168edec89db445fca257b499723b76c4e2
 =======
 >>>>>>> 9fc11a168edec89db445fca257b499723b76c4e2
 
