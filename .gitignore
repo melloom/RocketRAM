@@ -5,6 +5,7 @@ package-lock.json
 # Build outputs
 dist/
 build/
+<<<<<<< HEAD
 out/
 *.exe
 *.dmg
@@ -36,6 +37,15 @@ certs/
 .Spotlight-V100
 .Trashes
 ehthumbs.db
+=======
+*.exe
+*.dmg
+*.deb
+*.rpm
+
+# OS files
+.DS_Store
+>>>>>>> 9fc11a168edec89db445fca257b499723b76c4e2
 Thumbs.db
 desktop.ini
 
@@ -44,13 +54,17 @@ desktop.ini
 .idea/
 *.swp
 *.swo
+<<<<<<< HEAD
 *~
 *.sublime-project
 *.sublime-workspace
+=======
+>>>>>>> 9fc11a168edec89db445fca257b499723b76c4e2
 
 # Logs
 *.log
 npm-debug.log*
+<<<<<<< HEAD
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
@@ -60,6 +74,8 @@ lerna-debug.log*
 .env.local
 .env.*.local
 .env.production
+=======
+>>>>>>> 9fc11a168edec89db445fca257b499723b76c4e2
 
 # Settings (user-specific)
 rocketram-settings.json
@@ -67,6 +83,7 @@ rocketram-settings.json
 # Temporary files
 *.tmp
 *.temp
+<<<<<<< HEAD
 .cache/
 .temp/
 tmp/
@@ -99,4 +116,6 @@ coverage/
 
 # Yarn Integrity file
 .yarn-integrity
+=======
+>>>>>>> 9fc11a168edec89db445fca257b499723b76c4e2
 
