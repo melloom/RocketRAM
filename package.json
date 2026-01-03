@@ -8,6 +8,7 @@
     "dev": "electron . --dev",
     "build": "electron-builder",
     "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
     "build:portable": "electron-builder --win portable",
     "build:dir": "electron-builder --win --dir",
     "build:packager": "electron-packager . RocketRAM --platform=win32 --arch=x64 --out=dist --overwrite --asar=false",
@@ -34,12 +35,26 @@
         {
           "target": "dir",
           "arch": ["x64"]
-        }
+      }
       ]
     },
     "mac": {
       "icon": "icon.icns",
-      "category": "public.app-category.utilities"
+      "category": "public.app-category.utilities",
+      "gatekeeperAssess": false,
+      "hardenedRuntime": false,
+      "entitlements": "entitlements.mac.plist",
+      "entitlementsInherit": "entitlements.mac.plist",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["arm64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["arm64"]
+        }
+      ]
     },
     "linux": {
       "icon": "icon.png"
